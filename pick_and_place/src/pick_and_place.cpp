@@ -13,6 +13,14 @@
 #define DXL_RIGHT	  2
 #define	ADDRESS		"Goal_Position"
 
+/* Convert degree to radian function
+ * ================================= */
+double convertDegtoRad(double degree)
+{
+  double radian = degree*M_PI/180;
+  return radian;
+}
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "pick_and_place");
@@ -28,12 +36,11 @@ int main(int argc, char **argv)
   moveit::planning_interface::MoveGroupInterface arm("gluon");
 
   arm.setGoalJointTolerance(0.001);
-
   arm.setMaxAccelerationScalingFactor(1.0);
   arm.setMaxVelocityScalingFactor(1.0);
 
-  //set the position of gripper, values refer to DynamixelWizard 2.0 --> goal position
-  //set gripper open position
+  // Set the position of gripper, values refer to DynamixelWizard 2.0 --> goal position
+  // Set gripper to open position
   dynamixel_workbench_msgs::DynamixelCommand open;
   open.request.id_1 = DXL_LEFT;
   open.request.id_2 = DXL_RIGHT;
@@ -42,7 +49,7 @@ int main(int argc, char **argv)
   open.request.value_1 = 330;
   open.request.value_2 = 730;
 
-  //set gripper release position
+  // Set gripper to release position
   dynamixel_workbench_msgs::DynamixelCommand release;
   release.request.id_1 = DXL_LEFT;
   release.request.id_2 = DXL_RIGHT;
@@ -51,16 +58,16 @@ int main(int argc, char **argv)
   release.request.value_1 = 470;
   release.request.value_2 = 550;
 
-  //set gripper close position
+  // Set gripper to close position
   dynamixel_workbench_msgs::DynamixelCommand close_mid;
   close_mid.request.id_1 = DXL_LEFT;
   close_mid.request.id_2 = DXL_RIGHT;
   close_mid.request.addr_name_1 = ADDRESS;
   close_mid.request.addr_name_2 = ADDRESS;
-  close_mid.request.value_1 = 510;
-  close_mid.request.value_2 = 510;
+  close_mid.request.value_1 = 520;
+  close_mid.request.value_2 = 500;
 
-  //set gripper close position
+  // Set gripper close position
   dynamixel_workbench_msgs::DynamixelCommand close;
   close.request.id_1 = DXL_LEFT;
   close.request.id_2 = DXL_RIGHT;
@@ -69,313 +76,227 @@ int main(int argc, char **argv)
   close.request.value_1 = 542;
   close.request.value_2 = 482;
 
-  //set the waypoints
-  //in order of {joint1,joint2,joint3,joint4,joint5,joint6}, in degree
-  //look_table position
-  double look_table_axis1_deg = 0;
-  double look_table_axis2_deg = 0;
-  double look_table_axis3_deg = 0;
-  double look_table_axis4_deg = 0;
-  double look_table_axis5_deg = 0;
-  double look_table_axis6_deg = 0;
+  /* ==================
+   * Set Waypoints Pick
+   * ================== */
 
-  //(1) positions for cube
-  //approach_pick_1
-  double approach_pick_1_axis1_deg = 0;
-  double approach_pick_1_axis2_deg = 0;
-  double approach_pick_1_axis3_deg = 0;
-  double approach_pick_1_axis4_deg = 0;
-  double approach_pick_1_axis5_deg = 0;
-  double approach_pick_1_axis6_deg = 0;
+  // Picking & Placing position starts from left -> right
+  // Add in your desired inputs in degrees into convertDegtoRad() function
 
-  //pick_1
-  double pick_1_axis1_deg = 0;
-  double pick_1_axis2_deg = 0;
-  double pick_1_axis3_deg = 0;
-  double pick_1_axis4_deg = 0;
-  double pick_1_axis5_deg = 0;
-  double pick_1_axis6_deg = 0;
+  // Look table position
+  double look_table_axis1 = convertDegtoRad(-89);
+  double look_table_axis2 = convertDegtoRad(-21);
+  double look_table_axis3 = convertDegtoRad(74);
+  double look_table_axis4 = convertDegtoRad(97);
+  double look_table_axis5 = convertDegtoRad(90);
+  double look_table_axis6 = convertDegtoRad(-3);
+
+  // Approach pick 1 position
+  double approach_pick_1_axis1 = convertDegtoRad(-112);
+  double approach_pick_1_axis2 = convertDegtoRad(-78);
+  double approach_pick_1_axis3 = convertDegtoRad(48);
+  double approach_pick_1_axis4 = convertDegtoRad(39);
+  double approach_pick_1_axis5 = convertDegtoRad(88);
+  double approach_pick_1_axis6 = convertDegtoRad(-28);
+
+  // Pick 1 position
+  double pick_1_axis1 = convertDegtoRad(-112);
+  double pick_1_axis2 = convertDegtoRad(-84);
+  double pick_1_axis3 = convertDegtoRad(43);
+  double pick_1_axis4 = convertDegtoRad(40);
+  double pick_1_axis5 = convertDegtoRad(88);
+  double pick_1_axis6 = convertDegtoRad(-28);
 
   //(2) positions for triangular prism
   //approach_pick_2
-  double approach_pick_2_axis1_deg = 0;
-  double approach_pick_2_axis2_deg = 0;
-  double approach_pick_2_axis3_deg = 0;
-  double approach_pick_2_axis4_deg = 0;
-  double approach_pick_2_axis5_deg = 0;
-  double approach_pick_2_axis6_deg = 0;
+  double approach_pick_2_axis1 = convertDegtoRad(-74);
+  double approach_pick_2_axis2 = convertDegtoRad(-63);
+  double approach_pick_2_axis3 = convertDegtoRad(96);
+  double approach_pick_2_axis4 = convertDegtoRad(70);
+  double approach_pick_2_axis5 = convertDegtoRad(86);
+  double approach_pick_2_axis6 = convertDegtoRad(15);
 
   //pick_2
-  double pick_2_axis1_deg = 0;
-  double pick_2_axis2_deg = 0;
-  double pick_2_axis3_deg = 0;
-  double pick_2_axis4_deg = 0;
-  double pick_2_axis5_deg = 0;
-  double pick_2_axis6_deg = 0;
+  double pick_2_axis1 = convertDegtoRad(-74);
+  double pick_2_axis2 = convertDegtoRad(-68);
+  double pick_2_axis3 = convertDegtoRad(93);
+  double pick_2_axis4 = convertDegtoRad(72);
+  double pick_2_axis5 = convertDegtoRad(86);
+  double pick_2_axis6 = convertDegtoRad(15);
 
   //(3) positions for triangular prism
   //approach_pick_3
-  double approach_pick_3_axis1_deg = 0;
-  double approach_pick_3_axis2_deg = 0;
-  double approach_pick_3_axis3_deg = 0;
-  double approach_pick_3_axis4_deg = 0;
-  double approach_pick_3_axis5_deg = 0;
-  double approach_pick_3_axis6_deg = 0;
+  double approach_pick_3_axis1 = convertDegtoRad(-48);
+  double approach_pick_3_axis2 = convertDegtoRad(-72);
+  double approach_pick_3_axis3 = convertDegtoRad(71);
+  double approach_pick_3_axis4 = convertDegtoRad(53);
+  double approach_pick_3_axis5 = convertDegtoRad(92);
+  double approach_pick_3_axis6 = convertDegtoRad(40);
 
   //pick_3
-  double pick_3_axis1_deg = 0;
-  double pick_3_axis2_deg = 0;
-  double pick_3_axis3_deg = 0;
-  double pick_3_axis4_deg = 0;
-  double pick_3_axis5_deg = 0;
-  double pick_3_axis6_deg = 0;
+  double pick_3_axis1 = convertDegtoRad(-48);
+  double pick_3_axis2 = convertDegtoRad(-76);
+  double pick_3_axis3 = convertDegtoRad(68);
+  double pick_3_axis4 = convertDegtoRad(54);
+  double pick_3_axis5 = convertDegtoRad(92);
+  double pick_3_axis6 = convertDegtoRad(40);
 
   //position for placing
   //approach_place_1
-  double approach_place_1_axis1_deg = 0;
-  double approach_place_1_axis2_deg = 0;
-  double approach_place_1_axis3_deg = 0;
-  double approach_place_1_axis4_deg = 0;
-  double approach_place_1_axis5_deg = 0;
-  double approach_place_1_axis6_deg = 0;
+  double approach_place_1_axis1 = convertDegtoRad(-88);
+  double approach_place_1_axis2 = convertDegtoRad(-2);
+  double approach_place_1_axis3 = convertDegtoRad(-115);
+  double approach_place_1_axis4 = convertDegtoRad(-24);
+  double approach_place_1_axis5 = convertDegtoRad(-90);
+  double approach_place_1_axis6 = convertDegtoRad(158);
 
   //place_1
-  double place_1_axis1_deg = 0;
-  double place_1_axis2_deg = 0;
-  double place_1_axis3_deg = 0;
-  double place_1_axis4_deg = 0;
-  double place_1_axis5_deg = 0;
-  double place_1_axis6_deg = 0;
+  double place_1_axis1 = convertDegtoRad(-86);
+  double place_1_axis2 = convertDegtoRad(7);
+  double place_1_axis3 = convertDegtoRad(-113);
+  double place_1_axis4 = convertDegtoRad(-26);
+  double place_1_axis5 = convertDegtoRad(-92);
+  double place_1_axis6 = convertDegtoRad(160);
 
   //approach_place_2
-  double approach_place_2_axis1_deg = 0;
-  double approach_place_2_axis2_deg = 0;
-  double approach_place_2_axis3_deg = 0;
-  double approach_place_2_axis4_deg = 0;
-  double approach_place_2_axis5_deg = 0;
-  double approach_place_2_axis6_deg = 0;
+  double approach_place_2_axis1 = convertDegtoRad(-117);
+  double approach_place_2_axis2 = convertDegtoRad(-5);
+  double approach_place_2_axis3 = convertDegtoRad(-114);
+  double approach_place_2_axis4 = convertDegtoRad(-16);
+  double approach_place_2_axis5 = convertDegtoRad(-91);
+  double approach_place_2_axis6 = convertDegtoRad(150);
 
   //place_2
-  double place_2_axis1_deg = 0;
-  double place_2_axis2_deg = 0;
-  double place_2_axis3_deg = 0;
-  double place_2_axis4_deg = 0;
-  double place_2_axis5_deg = 0;
-  double place_2_axis6_deg = 0;
+  double place_2_axis1 = convertDegtoRad(-117);
+  double place_2_axis2 = convertDegtoRad(-1);
+  double place_2_axis3 = convertDegtoRad(-121);
+  double place_2_axis4 = convertDegtoRad(-27);
+  double place_2_axis5 = convertDegtoRad(-91);
+  double place_2_axis6 = convertDegtoRad(149);
 
   //approach_place_3
-  double approach_place_3_axis1_deg = 0;
-  double approach_place_3_axis2_deg = 0;
-  double approach_place_3_axis3_deg = 0;
-  double approach_place_3_axis4_deg = 0;
-  double approach_place_3_axis5_deg = 0;
-  double approach_place_3_axis6_deg = 0;
+  double approach_place_3_axis1 = convertDegtoRad(-146);
+  double approach_place_3_axis2 = convertDegtoRad(-1);
+  double approach_place_3_axis3 = convertDegtoRad(-118);
+  double approach_place_3_axis4 = convertDegtoRad(-28);
+  double approach_place_3_axis5 = convertDegtoRad(-90);
+  double approach_place_3_axis6 = convertDegtoRad(143);
 
   //place_3
-  double place_3_axis1_deg = 0;
-  double place_3_axis2_deg = 0;
-  double place_3_axis3_deg = 0;
-  double place_3_axis4_deg = 0;
-  double place_3_axis5_deg = 0;
-  double place_3_axis6_deg = 0;
+  double place_3_axis1 = convertDegtoRad(-146);
+  double place_3_axis2 = convertDegtoRad(2);
+  double place_3_axis3 = convertDegtoRad(-120);
+  double place_3_axis4 = convertDegtoRad(-33);
+  double place_3_axis5 = convertDegtoRad(-90);
+  double place_3_axis6 = convertDegtoRad(143);
 
-  /*****convert the value from degree to radian*****/
-  //look_table
-  double look_table_axis1_rad = look_table_axis1_deg*M_PI/180;
-  double look_table_axis2_rad = look_table_axis2_deg*M_PI/180;
-  double look_table_axis3_rad = look_table_axis3_deg*M_PI/180;
-  double look_table_axis4_rad = look_table_axis4_deg*M_PI/180;
-  double look_table_axis5_rad = look_table_axis5_deg*M_PI/180;
-  double look_table_axis6_rad = look_table_axis6_deg*M_PI/180;
+  /* Insert the values to waypoints, *DO NOT CHANGE*.
+     In order of {joint1,joint2,joint3,joint4,joint5,joint6}, in radians. */
 
-  //approach_pick_1
-  double approach_pick_1_axis1_rad = approach_pick_1_axis1_deg*M_PI/180;
-  double approach_pick_1_axis2_rad = approach_pick_1_axis2_deg*M_PI/180;
-  double approach_pick_1_axis3_rad = approach_pick_1_axis3_deg*M_PI/180;
-  double approach_pick_1_axis4_rad = approach_pick_1_axis4_deg*M_PI/180;
-  double approach_pick_1_axis5_rad = approach_pick_1_axis5_deg*M_PI/180;
-  double approach_pick_1_axis6_rad = approach_pick_1_axis6_deg*M_PI/180;
+  // Waypoint to home
+  std::vector<double> home = {0,0,0,0,0,0}; // Default values for home postion *DO NOT CHANGE*.
 
-  //pick_1
-  double pick_1_axis1_rad = pick_1_axis1_deg*M_PI/180;
-  double pick_1_axis2_rad = pick_1_axis2_deg*M_PI/180;
-  double pick_1_axis3_rad = pick_1_axis3_deg*M_PI/180;
-  double pick_1_axis4_rad = pick_1_axis4_deg*M_PI/180;
-  double pick_1_axis5_rad = pick_1_axis5_deg*M_PI/180;
-  double pick_1_axis6_rad = pick_1_axis6_deg*M_PI/180;
+  // Waypoint to look table
+  std::vector<double> look_table = { look_table_axis1,
+                                      look_table_axis2,
+                                        look_table_axis3,
+                                          look_table_axis4,
+                                            look_table_axis5,
+                                              look_table_axis6 };
 
-  //approach_pick_2
-  double approach_pick_2_axis1_rad = approach_pick_2_axis1_deg*M_PI/180;
-  double approach_pick_2_axis2_rad = approach_pick_2_axis2_deg*M_PI/180;
-  double approach_pick_2_axis3_rad = approach_pick_2_axis3_deg*M_PI/180;
-  double approach_pick_2_axis4_rad = approach_pick_2_axis4_deg*M_PI/180;
-  double approach_pick_2_axis5_rad = approach_pick_2_axis5_deg*M_PI/180;
-  double approach_pick_2_axis6_rad = approach_pick_2_axis6_deg*M_PI/180;
+  // Waypoint (1) to place
+  std::vector<double> approach_place_1 = { approach_place_1_axis1,
+                                            approach_place_1_axis2,
+                                              approach_place_1_axis3,
+                                                approach_place_1_axis4,
+                                                  approach_place_1_axis5,
+                                                    approach_place_1_axis6 };
+  
+  std::vector<double> place_1 = { place_1_axis1,
+                                    place_1_axis2,
+                                      place_1_axis3,
+                                        place_1_axis4,
+                                          place_1_axis5,
+                                            place_1_axis6 };
 
-  //pick_2
-  double pick_2_axis1_rad = pick_2_axis1_deg*M_PI/180;
-  double pick_2_axis2_rad = pick_2_axis2_deg*M_PI/180;
-  double pick_2_axis3_rad = pick_2_axis3_deg*M_PI/180;
-  double pick_2_axis4_rad = pick_2_axis4_deg*M_PI/180;
-  double pick_2_axis5_rad = pick_2_axis5_deg*M_PI/180;
-  double pick_2_axis6_rad = pick_2_axis6_deg*M_PI/180;
+  // Waypoint (2) to place
+  std::vector<double> approach_place_2 = { approach_place_2_axis1,
+                                            approach_place_2_axis2,
+                                              approach_place_2_axis3,
+                                                approach_place_2_axis4,
+                                                  approach_place_2_axis5,
+                                                    approach_place_2_axis6 };
 
-  //approach_pick_3
-  double approach_pick_3_axis1_rad = approach_pick_3_axis1_deg*M_PI/180;
-  double approach_pick_3_axis2_rad = approach_pick_3_axis2_deg*M_PI/180;
-  double approach_pick_3_axis3_rad = approach_pick_3_axis3_deg*M_PI/180;
-  double approach_pick_3_axis4_rad = approach_pick_3_axis4_deg*M_PI/180;
-  double approach_pick_3_axis5_rad = approach_pick_3_axis5_deg*M_PI/180;
-  double approach_pick_3_axis6_rad = approach_pick_3_axis6_deg*M_PI/180;
+  std::vector<double> place_2 = { place_2_axis1,
+                                    place_2_axis2,
+                                      place_2_axis3,
+                                        place_2_axis4,
+                                          place_2_axis5,
+                                            place_2_axis6 };
 
-  //pick_3
-  double pick_3_axis1_rad = pick_3_axis1_deg*M_PI/180;
-  double pick_3_axis2_rad = pick_3_axis2_deg*M_PI/180;
-  double pick_3_axis3_rad = pick_3_axis3_deg*M_PI/180;
-  double pick_3_axis4_rad = pick_3_axis4_deg*M_PI/180;
-  double pick_3_axis5_rad = pick_3_axis5_deg*M_PI/180;
-  double pick_3_axis6_rad = pick_3_axis6_deg*M_PI/180;
+  // Waypoint (3) to place
+  std::vector<double> approach_place_3 = { approach_place_3_axis1,
+                                            approach_place_3_axis2,
+                                              approach_place_3_axis3,
+                                                approach_place_3_axis4,
+                                                  approach_place_3_axis5,
+                                                    approach_place_3_axis6 };
 
-  //approach_place_1
-  double approach_place_1_axis1_rad = approach_place_1_axis1_deg*M_PI/180;
-  double approach_place_1_axis2_rad = approach_place_1_axis2_deg*M_PI/180;
-  double approach_place_1_axis3_rad = approach_place_1_axis3_deg*M_PI/180;
-  double approach_place_1_axis4_rad = approach_place_1_axis4_deg*M_PI/180;
-  double approach_place_1_axis5_rad = approach_place_1_axis5_deg*M_PI/180;
-  double approach_place_1_axis6_rad = approach_place_1_axis6_deg*M_PI/180;
+  std::vector<double> place_3 = { place_3_axis1,
+                                    place_3_axis2,
+                                      place_3_axis3,
+                                        place_3_axis4,
+                                          place_3_axis5,
+                                            place_3_axis6 };
 
-  //place_1
-  double place_1_axis1_rad = place_1_axis1_deg*M_PI/180;
-  double place_1_axis2_rad = place_1_axis2_deg*M_PI/180;
-  double place_1_axis3_rad = place_1_axis3_deg*M_PI/180;
-  double place_1_axis4_rad = place_1_axis4_deg*M_PI/180;
-  double place_1_axis5_rad = place_1_axis5_deg*M_PI/180;
-  double place_1_axis6_rad = place_1_axis6_deg*M_PI/180;
+  // Waypoint (1) to pick
+  std::vector<double> approach_pick_1 = { approach_pick_1_axis1,
+                                            approach_pick_1_axis2,
+                                              approach_pick_1_axis3,
+                                                approach_pick_1_axis4,
+                                                  approach_pick_1_axis5,
+                                                    approach_pick_1_axis6 };
+                                          
+  std::vector<double> pick_1 = {  pick_1_axis1,
+                                    pick_1_axis2,
+                                      pick_1_axis3,
+                                        pick_1_axis4,
+                                          pick_1_axis5,
+                                           pick_1_axis6 };
 
-  //approach_place_2
-  double approach_place_2_axis1_rad = approach_place_2_axis1_deg*M_PI/180;
-  double approach_place_2_axis2_rad = approach_place_2_axis2_deg*M_PI/180;
-  double approach_place_2_axis3_rad = approach_place_2_axis3_deg*M_PI/180;
-  double approach_place_2_axis4_rad = approach_place_2_axis4_deg*M_PI/180;
-  double approach_place_2_axis5_rad = approach_place_2_axis5_deg*M_PI/180;
-  double approach_place_2_axis6_rad = approach_place_2_axis6_deg*M_PI/180;
+  // Waypoint (2) to pick
+  std::vector<double> approach_pick_2 = { approach_pick_2_axis1,
+                                            approach_pick_2_axis2,
+                                              approach_pick_2_axis3,
+                                                approach_pick_2_axis4,
+                                                  approach_pick_2_axis5,
+                                                    approach_pick_2_axis6 };
 
-  //place_2
-  double place_2_axis1_rad = place_2_axis1_deg*M_PI/180;
-  double place_2_axis2_rad = place_2_axis2_deg*M_PI/180;
-  double place_2_axis3_rad = place_2_axis3_deg*M_PI/180;
-  double place_2_axis4_rad = place_2_axis4_deg*M_PI/180;
-  double place_2_axis5_rad = place_2_axis5_deg*M_PI/180;
-  double place_2_axis6_rad = place_2_axis6_deg*M_PI/180;
+  std::vector<double> pick_2 = {  pick_2_axis1,
+                                    pick_2_axis2,
+                                      pick_2_axis3,
+                                        pick_2_axis4,
+                                          pick_2_axis5,
+                                            pick_2_axis6 };
 
-  //approach_place_3
-  double approach_place_3_axis1_rad = approach_place_3_axis1_deg*M_PI/180;
-  double approach_place_3_axis2_rad = approach_place_3_axis2_deg*M_PI/180;
-  double approach_place_3_axis3_rad = approach_place_3_axis3_deg*M_PI/180;
-  double approach_place_3_axis4_rad = approach_place_3_axis4_deg*M_PI/180;
-  double approach_place_3_axis5_rad = approach_place_3_axis5_deg*M_PI/180;
-  double approach_place_3_axis6_rad = approach_place_3_axis6_deg*M_PI/180;
+  // Waypoint (3) to pick
+  std::vector<double> approach_pick_3 = { approach_pick_3_axis1,
+                                            approach_pick_3_axis2,
+                                              approach_pick_3_axis3,
+                                                approach_pick_3_axis4,
+                                                  approach_pick_3_axis5,
+                                                    approach_pick_3_axis6 };
 
-  //place_3
-  double place_3_axis1_rad = place_3_axis1_deg*M_PI/180;
-  double place_3_axis2_rad = place_3_axis2_deg*M_PI/180;
-  double place_3_axis3_rad = place_3_axis3_deg*M_PI/180;
-  double place_3_axis4_rad = place_3_axis4_deg*M_PI/180;
-  double place_3_axis5_rad = place_3_axis5_deg*M_PI/180;
-  double place_3_axis6_rad = place_3_axis6_deg*M_PI/180;
+  std::vector<double> pick_3 = {  pick_3_axis1,
+                                    pick_3_axis2,
+                                      pick_3_axis3,
+                                        pick_3_axis4,
+                                          pick_3_axis5,
+                                            pick_3_axis6 };
 
-  //insert the values to waypoints, do not change
-  //in order of {joint1,joint2,joint3,joint4,joint5,joint6}, in radian
-  std::vector<double> home = {0,0,0,0,0,0}; // do not change.
-  std::vector<double> look_table = {look_table_axis1_rad,
-                                    look_table_axis2_rad,
-                                    look_table_axis3_rad,
-                                    look_table_axis4_rad,
-                                    look_table_axis5_rad,
-                                    look_table_axis6_rad};
-
-  std::vector<double> approach_place_1 = {approach_place_1_axis1_rad,
-                                        approach_place_1_axis2_rad,
-                                        approach_place_1_axis3_rad,
-                                        approach_place_1_axis4_rad,
-                                        approach_place_1_axis5_rad,
-                                        approach_place_1_axis6_rad};
-  std::vector<double> place_1 = {place_1_axis1_rad,
-                               place_1_axis2_rad,
-                               place_1_axis3_rad,
-                               place_1_axis4_rad,
-                               place_1_axis5_rad,
-                               place_1_axis6_rad};
-
-  std::vector<double> approach_place_2 = {approach_place_2_axis1_rad,
-                                          approach_place_2_axis2_rad,
-                                          approach_place_2_axis3_rad,
-                                          approach_place_2_axis4_rad,
-                                          approach_place_2_axis5_rad,
-                                          approach_place_2_axis6_rad};
-  std::vector<double> place_2 = {place_2_axis1_rad,
-                                 place_2_axis2_rad,
-                                 place_2_axis3_rad,
-                                 place_2_axis4_rad,
-                                 place_2_axis5_rad,
-                                 place_2_axis6_rad};
-
-  std::vector<double> approach_place_3 = {approach_place_3_axis1_rad,
-                                          approach_place_3_axis2_rad,
-                                          approach_place_3_axis3_rad,
-                                          approach_place_3_axis4_rad,
-                                          approach_place_3_axis5_rad,
-                                          approach_place_3_axis6_rad};
-  std::vector<double> place_3 = {place_3_axis1_rad,
-                                 place_3_axis2_rad,
-                                 place_3_axis3_rad,
-                                 place_3_axis4_rad,
-                                 place_3_axis5_rad,
-                                 place_3_axis6_rad};
-
-  //(1) waypoints to pick
-  std::vector<double> approach_pick_1 = {approach_pick_1_axis1_rad,
-                                         approach_pick_1_axis2_rad,
-                                         approach_pick_1_axis3_rad,
-                                         approach_pick_1_axis4_rad,
-                                         approach_pick_1_axis5_rad,
-                                         approach_pick_1_axis6_rad};
-  std::vector<double> pick_1 = {pick_1_axis1_rad,
-                                pick_1_axis2_rad,
-                                pick_1_axis3_rad,
-                                pick_1_axis4_rad,
-                                pick_1_axis5_rad,
-                                pick_1_axis6_rad};
-
-  //(2) waypoints to pick
-  std::vector<double> approach_pick_2 = {approach_pick_2_axis1_rad,
-                                         approach_pick_2_axis2_rad,
-                                         approach_pick_2_axis3_rad,
-                                         approach_pick_2_axis4_rad,
-                                         approach_pick_2_axis5_rad,
-                                         approach_pick_2_axis6_rad};
-  std::vector<double> pick_2 = {pick_2_axis1_rad,
-                                pick_2_axis2_rad,
-                                pick_2_axis3_rad,
-                                pick_2_axis4_rad,
-                                pick_2_axis5_rad,
-                                pick_2_axis6_rad};
-
-  //(3) waypoints to pick
-  std::vector<double> approach_pick_3 = {approach_pick_3_axis1_rad,
-                                         approach_pick_3_axis2_rad,
-                                         approach_pick_3_axis3_rad,
-                                         approach_pick_3_axis4_rad,
-                                         approach_pick_3_axis5_rad,
-                                         approach_pick_3_axis6_rad};
-  std::vector<double> pick_3 = {pick_3_axis1_rad,
-                                pick_3_axis2_rad,
-                                pick_3_axis3_rad,
-                                pick_3_axis4_rad,
-                                pick_3_axis5_rad,
-                                pick_3_axis6_rad};
-
-  /*****open gripper befor start*****/
+  /* ========================
+     Open gripper to begin
+     ======================== */
   if (goal_dynamixel_command_client_.call(open))
   {
     ROS_INFO ("open gripper");
@@ -422,7 +343,7 @@ int main(int argc, char **argv)
   sleep(0.5);
 
   /*****close gripper*****/
-  if (goal_dynamixel_command_client_.call(close))
+  if (goal_dynamixel_command_client_.call(close_mid))
   {
     ROS_INFO ("close gripper");
   }
@@ -627,6 +548,17 @@ int main(int argc, char **argv)
   arm.setJointValueTarget(approach_place_3);
   arm.move();
   ROS_INFO("Arm is moving to approach_place position");
+  sleep(0.5);
+
+  if (goal_dynamixel_command_client_.call(open))
+  {
+    ROS_INFO ("release gripper");
+  }
+  else
+  {
+    ROS_ERROR("failed to release gripper");
+    return 1;
+  }
   sleep(0.5);
 
   /*****go back to home position*****/
